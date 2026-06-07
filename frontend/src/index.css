@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg: #f3f2ef;
+  --bg2: #f3f2ef;
+  --surface: #ffffff;
+  --surface2: #f3f2ef;
+  --border: #e0dfdc;
+  --accent: #0a66c2;
+  --accent-hover: #004182;
+  --accent-light: #dce6f1;
+  --text: #000000;
+  --text2: #191919;
+  --muted: #666666;
+  --danger: #cc1016;
+  --success: #057642;
+  --shadow: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.05);
+  --radius: 8px;
+}
+
+[data-theme="dark"] {
+  --bg: #1b1f23;
+  --bg2: #16191c;
+  --surface: #1d2226;
+  --surface2: #23282d;
+  --border: #38434f;
+  --accent: #70b5f9;
+  --accent-hover: #9fcef9;
+  --accent-light: #1d3045;
+  --text: #e7e7e7;
+  --text2: #b0b0b0;
+  --muted: #8b8b8b;
+  --danger: #f55656;
+  --success: #5bac81;
+  --shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.3s, color 0.3s;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
