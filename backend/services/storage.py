@@ -11,11 +11,11 @@ cloudinary.config(
     api_secret=os.getenv("CLOUDINARY_API_SECRET")
 )
 
-async def upload_file(file) -> str:
-    contents = await file.read()
+async def upload_file_from_bytes(contents: bytes, filename: str) -> str:
     result = cloudinary.uploader.upload(
         contents,
         folder="receipt-radar",
-        resource_type="auto"
+        resource_type="auto",
+        public_id=filename
     )
     return result["secure_url"]
