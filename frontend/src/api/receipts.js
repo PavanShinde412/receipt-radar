@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API = 'http://localhost:8000/api'
+const API = 'https://receipt-radar-production.up.railway.app/api'
 
 export const uploadReceipt = async (file) => {
     const formData = new FormData()
