@@ -8,7 +8,10 @@ app = FastAPI(title="ReceiptRadar API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://receipt-radar-beige.vercel.app",
+    ],
     allow_methods=["*"],
     allow_headers=["*"],
 )
