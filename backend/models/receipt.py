@@ -10,8 +10,8 @@ class Receipt(Base):
     __tablename__ = "receipts"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    merchant = Column(String, nullable=False)
-    amount = Column(Float, nullable=False)
+    merchant = Column(String, nullable=True)
+    amount = Column(Float, nullable=True)
     date = Column(Date, nullable=True)
     category = Column(String, nullable=True)
     file_url = Column(String, nullable=True)
