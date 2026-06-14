@@ -190,7 +190,7 @@ receipt-radar/
 
 **Pavan Shinde**
 - GitHub: [@PavanShinde412](https://github.com/PavanShinde412)
-- LinkedIn: [linkedin.com/in/pavanshinde](https://linkedin.com/in/pavanshinde412)
+- LinkedIn: [linkedin.com/in/pavanshinde412](https://linkedin.com/in/pavanshinde412)
 
 ---
 
