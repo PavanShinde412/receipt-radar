@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getReceipts, updateWarranty } from '../api/receipts'
+import { getReceipts, updateWarranty, deleteReceipt } from '../api/receipts'
 import { Link } from 'react-router-dom'
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -263,9 +263,26 @@ function Dashboard() {
                                             {r.date !== 'None' ? r.date : 'Date unknown'} • Uploaded {new Date(r.created_at).toLocaleDateString()}
                                         </p>
                                     </div>
-                                    <span style={{ fontSize: '17px', fontWeight: 700, color: 'var(--text)' }}>
-                                        ₹{r.amount || 0}
-                                    </span>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <span style={{ fontSize: '17px', fontWeight: 700, color: 'var(--text)' }}>
+                                            ₹{r.amount || 0}
+                                        </span>
+                                        <button
+                                            onClick={async () => {
+                                                await deleteReceipt(r.id)
+                                                fetchReceipts()
+                                            }}
+                                            style={{
+                                                background: 'transparent',
+                                                border: '1px solid var(--danger)',
+                                                color: 'var(--danger)',
+                                                borderRadius: '6px',
+                                                padding: '4px 10px',
+                                                fontSize: '12px',
+                                                cursor: 'pointer',
+                                                fontWeight: 500,
+                                            }}>🗑️ Delete</button>
+                                    </div>
                                 </div>
 
                                 {/* Warranty section */}
@@ -309,8 +326,9 @@ function Dashboard() {
                         )
                     })}
                 </div>
-            )}
-        </div>
+            )
+            }
+        </div >
     )
 }
 

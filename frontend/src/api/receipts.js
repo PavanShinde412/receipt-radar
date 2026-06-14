@@ -20,3 +20,8 @@ export const updateWarranty = async (id, date) => {
     })
     return res.data
 }
+
+export const deleteReceipt = async (id) => {
+    const res = await axios.delete(`${API}/receipts/${id}`)
+    return res.data
+}
