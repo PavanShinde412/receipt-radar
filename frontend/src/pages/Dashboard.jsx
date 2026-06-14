@@ -1,15 +1,19 @@
 import { useEffect, useState } from 'react'
 import { getReceipts, updateWarranty } from '../api/receipts'
 import { Link } from 'react-router-dom'
+import {
+    BarChart, Bar, XAxis, YAxis, CartesianGrid,
+    Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend
+} from 'recharts'
 
 const categoryColors = {
-    Food: { bg: '#fef3c7', color: '#92400e' },
-    Electronics: { bg: '#dbeafe', color: '#1e40af' },
-    Clothing: { bg: '#fce7f3', color: '#9d174d' },
-    Medical: { bg: '#dcfce7', color: '#166534' },
-    Travel: { bg: '#ede9fe', color: '#5b21b6' },
-    Utilities: { bg: '#ffedd5', color: '#9a3412' },
-    Other: { bg: '#f1f5f9', color: '#475569' },
+    Food: '#f59e0b',
+    Electronics: '#3b82f6',
+    Clothing: '#ec4899',
+    Medical: '#10b981',
+    Travel: '#8b5cf6',
+    Utilities: '#f97316',
+    Other: '#6b7280',
 }
 
 function Dashboard() {
@@ -17,9 +21,7 @@ function Dashboard() {
     const [loading, setLoading] = useState(true)
     const [warrantyInputs, setWarrantyInputs] = useState({})
 
-    useEffect(() => {
-        fetchReceipts()
-    }, [])
+    useEffect(() => { fetchReceipts() }, [])
 
     const fetchReceipts = async () => {
         try {
@@ -45,6 +47,29 @@ function Dashboard() {
         const days = (new Date(r.warranty_expiry) - new Date()) / (1000 * 60 * 60 * 24)
         return days <= 30 && days >= 0
     }).length
+
+    // Monthly spending data
+    const monthlyData = receipts.reduce((acc, r) => {
+        if (!r.date || r.date === 'None') return acc
+        const month = new Date(r.date).toLocaleString('default', { month: 'short', year: '2-digit' })
+        acc[month] = (acc[month] || 0) + (r.amount || 0)
+        return acc
+    }, {})
+
+    const monthlyChartData = Object.entries(monthlyData)
+        .map(([month, amount]) => ({ month, amount: parseFloat(amount.toFixed(0)) }))
+        .slice(-6)
+
+    // Category spending data
+    const categoryData = receipts.reduce((acc, r) => {
+        const cat = r.category || 'Other'
+        acc[cat] = (acc[cat] || 0) + (r.amount || 0)
+        return acc
+    }, {})
+
+    const categoryChartData = Object.entries(categoryData)
+        .map(([name, value]) => ({ name, value: parseFloat(value.toFixed(0)) }))
+        .filter(d => d.value > 0)
 
     return (
         <div style={{ maxWidth: '900px', margin: '24px auto', padding: '0 16px' }}>
@@ -93,6 +118,94 @@ function Dashboard() {
                 ))}
             </div>
 
+            {/* Charts */}
+            {receipts.length > 0 && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+
+                    {/* Monthly spending bar chart */}
+                    <div style={{
+                        background: 'var(--surface)', border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius)', padding: '20px',
+                        boxShadow: 'var(--shadow)',
+                    }}>
+                        <p style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text)', marginBottom: '16px' }}>
+                            📅 Monthly Spending
+                        </p>
+                        {monthlyChartData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height={180}>
+                                <BarChart data={monthlyChartData}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: 'var(--muted)' }} />
+                                    <YAxis tick={{ fontSize: 11, fill: 'var(--muted)' }} />
+                                    <Tooltip
+                                        formatter={(val) => [`₹${val}`, 'Spent']}
+                                        contentStyle={{
+                                            background: 'var(--surface)',
+                                            border: '1px solid var(--border)',
+                                            borderRadius: '8px',
+                                            fontSize: '12px'
+                                        }}
+                                    />
+                                    <Bar dataKey="amount" fill="var(--accent)" radius={[4, 4, 0, 0]} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <p style={{ color: 'var(--muted)', fontSize: '13px', textAlign: 'center', padding: '40px 0' }}>
+                                No data yet
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Category pie chart */}
+                    <div style={{
+                        background: 'var(--surface)', border: '1px solid var(--border)',
+                        borderRadius: 'var(--radius)', padding: '20px',
+                        boxShadow: 'var(--shadow)',
+                    }}>
+                        <p style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text)', marginBottom: '16px' }}>
+                            🏷️ Spending by Category
+                        </p>
+                        {categoryChartData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height={180}>
+                                <PieChart>
+                                    <Pie
+                                        data={categoryChartData}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={45}
+                                        outerRadius={70}
+                                        paddingAngle={3}
+                                        dataKey="value"
+                                    >
+                                        {categoryChartData.map((entry) => (
+                                            <Cell key={entry.name} fill={categoryColors[entry.name] || '#6b7280'} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip
+                                        formatter={(val) => [`₹${val}`, 'Spent']}
+                                        contentStyle={{
+                                            background: 'var(--surface)',
+                                            border: '1px solid var(--border)',
+                                            borderRadius: '8px',
+                                            fontSize: '12px'
+                                        }}
+                                    />
+                                    <Legend
+                                        iconSize={10}
+                                        iconType="circle"
+                                        wrapperStyle={{ fontSize: '11px' }}
+                                    />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <p style={{ color: 'var(--muted)', fontSize: '13px', textAlign: 'center', padding: '40px 0' }}>
+                                No data yet
+                            </p>
+                        )}
+                    </div>
+                </div>
+            )}
+
             {/* Receipts list */}
             {loading ? (
                 <div style={{ textAlign: 'center', padding: '60px', color: 'var(--muted)' }}>
@@ -120,7 +233,8 @@ function Dashboard() {
             ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     {receipts.map(r => {
-                        const cat = categoryColors[r.category] || categoryColors.Other
+                        const cat = r.category || 'Other'
+                        const catColor = categoryColors[cat] || '#6b7280'
                         const hasWarranty = r.warranty_expiry && r.warranty_expiry !== 'None'
                         const daysLeft = hasWarranty
                             ? Math.ceil((new Date(r.warranty_expiry) - new Date()) / (1000 * 60 * 60 * 24))
@@ -135,18 +249,22 @@ function Dashboard() {
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                                     <div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                                            <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text)' }}>{r.merchant}</span>
+                                            <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text)' }}>
+                                                {r.merchant || 'Unknown'}
+                                            </span>
                                             <span style={{
-                                                background: cat.bg, color: cat.color,
-                                                padding: '2px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 500
-                                            }}>{r.category}</span>
+                                                background: catColor + '20',
+                                                color: catColor,
+                                                padding: '2px 10px', borderRadius: '20px',
+                                                fontSize: '11px', fontWeight: 500
+                                            }}>{cat}</span>
                                         </div>
                                         <p style={{ color: 'var(--muted)', fontSize: '12px' }}>
                                             {r.date !== 'None' ? r.date : 'Date unknown'} • Uploaded {new Date(r.created_at).toLocaleDateString()}
                                         </p>
                                     </div>
                                     <span style={{ fontSize: '17px', fontWeight: 700, color: 'var(--text)' }}>
-                                        ₹{r.amount}
+                                        ₹{r.amount || 0}
                                     </span>
                                 </div>
 
