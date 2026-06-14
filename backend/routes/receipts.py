@@ -4,6 +4,8 @@ from database import get_db
 from models.receipt import Receipt
 from pydantic import BaseModel
 from datetime import date
+from sqlalchemy import cast
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 
 router = APIRouter()
 
@@ -35,3 +37,12 @@ def update_warranty(receipt_id: str, data: WarrantyUpdate, db: Session = Depends
     receipt.warranty_expiry = data.warranty_expiry
     db.commit()
     return {"message": "Warranty date updated", "warranty_expiry": str(receipt.warranty_expiry)}
+
+@router.delete("/receipts/{receipt_id}")
+def delete_receipt(receipt_id: str, db: Session = Depends(get_db)):
+    receipt = db.query(Receipt).filter(Receipt.id == receipt_id).first()
+    if not receipt:
+        raise HTTPException(status_code=404, detail="Receipt not found")
+    db.delete(receipt)
+    db.commit()
+    return {"message": "Receipt deleted successfully"}
